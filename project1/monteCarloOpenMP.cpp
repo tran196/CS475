@@ -6,12 +6,12 @@
 
 // setting the number of threads:
 #ifndef NUMT
-#define NUMT		1
+#define NUMT		16
 #endif
 
 // setting the number of trials in the monte carlo simulation:
 #ifndef NUMTRIALS
-#define NUMTRIALS	1000000
+#define NUMTRIALS	100000
 #endif
 
 // how many tries to discover the maximum performance:
@@ -135,6 +135,7 @@ main( int argc, char *argv[ ] )
 
 	}
 	printf("Number of Trials = %d\n", NUMTRIALS);
+	printf("Probability of hitting plate = %d\n", currentProb);
 	printf("Peak Performance = %10.2lf Megatrials/Sec\n", maxPerformance);
 
 	return 0;
