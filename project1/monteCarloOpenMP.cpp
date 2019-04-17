@@ -6,7 +6,7 @@
 
 // setting the number of threads:
 #ifndef NUMT
-#define NUMT		16
+#define NUMT		2
 #endif
 
 // setting the number of trials in the monte carlo simulation:
@@ -44,7 +44,7 @@ main( int argc, char *argv[ ] )
 	TimeOfDaySeed( );		// seed the random number generator
 
 	omp_set_num_threads( NUMT );	// set the number of threads to use in the for-loop:`
-	fprintf( stderr, "Using %d threads\n", NUMT );
+	
 	
 	// better to define these here so that the rand() calls don't get into the thread timing:
 	float *xcs = new float [NUMTRIALS];
@@ -132,16 +132,19 @@ main( int argc, char *argv[ ] )
 			if( megaTrialsPerSecond > maxPerformance )
 				maxPerformance = megaTrialsPerSecond;
 			currentProb = (float)numHits/(float)NUMTRIALS;
+			
 
 	}
+	fprintf( stderr, "Using %d threads\n", NUMT );
 	printf("Number of Trials = %d\n", NUMTRIALS);
-	printf("Probability of hitting plate = %d\n", currentProb);
+	printf("Probability of hitting plate = %lf\n", currentProb);
 	printf("Peak Performance = %10.2lf Megatrials/Sec\n", maxPerformance);
 
 	return 0;
 }
 
 
+//Helper Functions
 float
 Ranf( float low, float high )
 {
