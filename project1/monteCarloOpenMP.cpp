@@ -132,12 +132,15 @@ main( int argc, char *argv[ ] )
 			if( megaTrialsPerSecond > maxPerformance )
 				maxPerformance = megaTrialsPerSecond;
 			currentProb = (float)numHits/(float)NUMTRIALS;
+			printf("Probability of hitting plate = %f\n", currentProb);
+			printf("Num Hits: = %d\n", numHits);
+			printf("Num Trials = %d\n", NUMTRIALS);
 			
 
 	}
 	fprintf( stderr, "Using %d threads\n", NUMT );
 	printf("Number of Trials = %d\n", NUMTRIALS);
-	printf("Probability of hitting plate = %lf\n", currentProb);
+	// printf("Probability of hitting plate = %f\n", currentProb);
 	printf("Peak Performance = %10.2lf Megatrials/Sec\n", maxPerformance);
 
 	return 0;
