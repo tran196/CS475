@@ -44,6 +44,7 @@ main( int argc, char *argv[ ] )
 	TimeOfDaySeed( );		// seed the random number generator
 
 	omp_set_num_threads( NUMT );	// set the number of threads to use in the for-loop:`
+	fprintf( stderr, "Using %d threads\n", NUMT );
 	
 	// better to define these here so that the rand() calls don't get into the thread timing:
 	float *xcs = new float [NUMTRIALS];
