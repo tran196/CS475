@@ -1,3 +1,6 @@
+// Tuan Tran
+// Project 2
+
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
