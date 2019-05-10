@@ -152,7 +152,7 @@ Grain( )
         TempHeight += tempFactor * precipFactor * GRAIN_GROWS_PER_MONTH;
         TempHeight -= (float)NowNumDeer * ONE_DEER_EATS_PER_MONTH;
 
-        if (TempHeight < 0)
+        if (TempHeight < 0.)
         {
             TempHeight = 0.;
         }
