@@ -255,7 +255,7 @@ MoreDeer( )
         if (NowMonth == 1)
         {
             // AdditionalDeer = 1;
-            AdditionalDeer = 2;
+            AdditionalDeer = 6;
         }
         else
         {
