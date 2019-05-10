@@ -34,10 +34,10 @@ const float MIDTEMP =				40.0;
 const float MIDPRECIP =				10.0;
 
 //****************************************
-const float BLACKDEATH_TEMP_MIN         =   40.0;  // range of temps BlackDeath prefers
+const float BLACKDEATH_TEMP_MIN         =   40.0;  
 const float BLACKDEATH_TEMP_MAX         =   60.0;
 const float BLACKDEATH_FREEZE           =   32.0;
-const float BLACKDEATH_PRECIP_THRESH    =   7;     // BlackDeath thrives in precip > 7
+const float BLACKDEATH_PRECIP_THRESH    =   7;     
 float BlackDeathPct; 
 
 
@@ -63,7 +63,7 @@ void        BlackDeath();
 
 int main ()
 {
-    // TimeOfDaySeed();
+;
     // starting date and time:
     NowMonth =    0;
     NowYear  = 2019;
@@ -74,7 +74,7 @@ int main ()
     
     BlackDeathPct=  0.;   
 
-    printf( "Month\tYear\tTemp(C)\tPrecipitation(cm)\tGrain Height\tDeer\tBlackDeath Percentage\n");
+    printf( "Month\tYear\tTemp(C)\tPrecipitation(cm)\tGrain Height\tGrainDeer\tBlackDeath Percentage\n");
 
 
 
@@ -153,9 +153,9 @@ Grain( )
         TempHeight += tempFactor * precipFactor * GRAIN_GROWS_PER_MONTH;
         TempHeight -= (float)NowNumDeer * ONE_DEER_EATS_PER_MONTH;
 
-            #ifdef BlackDeath
-            TempHeight *= (1 - (BlackDeathPct/100));
-            #endif
+        #ifdef BlackDeath
+        TempHeight *= (1 - (BlackDeathPct/100));
+        #endif
 
         if (TempHeight < 0)
         {
