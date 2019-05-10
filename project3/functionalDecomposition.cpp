@@ -243,7 +243,7 @@ MoreDeer( )
         tempDeer = NowNumDeer;
         if (NowMonth == 1)
         {
-            AdditionalDeer = 4;
+            AdditionalDeer = 1;
             
         }
         else
