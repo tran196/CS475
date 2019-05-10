@@ -35,6 +35,12 @@ const float MIDPRECIP =				10.0;
 
 unsigned int seed;
 
+
+omp_lock_t Lock;
+int NumInThreadTeam;
+int NumAtBarrier;
+int NumGone;
+
 //Functions
 
 // function prototypes:
@@ -65,16 +71,20 @@ int main ()
 // A year consists of 12 months and 30 days each
 // First Day of winter is January 1
 // Temp and Precipitation follow cosine and since Wave patterns with some randomness added
-    float ang = (  30.*(float)NowMonth + 15.  ) * ( M_PI / 180. );
+    // float ang = (  30.*(float)NowMonth + 15.  ) * ( M_PI / 180. );
 
-    float temp = AVG_TEMP - AMP_TEMP * cos( ang );
-    unsigned int seed = 0;
-    NowTemp = temp + Ranf( &seed, -RANDOM_TEMP, RANDOM_TEMP );
+    // float temp = AVG_TEMP - AMP_TEMP * cos( ang );
+    // unsigned int seed = 0;
+    // NowTemp = temp + Ranf( &seed, -RANDOM_TEMP, RANDOM_TEMP );
 
-    float precip = AVG_PRECIP_PER_MONTH + AMP_PRECIP_PER_MONTH * sin( ang );
-    NowPrecip = precip + Ranf( &seed,  -RANDOM_PRECIP, RANDOM_PRECIP );
-    if( NowPrecip < 0. )
-        NowPrecip = 0.;
+    // float precip = AVG_PRECIP_PER_MONTH + AMP_PRECIP_PER_MONTH * sin( ang );
+    // NowPrecip = precip + Ranf( &seed,  -RANDOM_PRECIP, RANDOM_PRECIP );
+    // if( NowPrecip < 0. )
+    //     NowPrecip = 0.;
+
+
+    printf( "Month\tYear\tTemp(C)\tPrecipitation(cm)\tGrain Height\tDeer\tAdditional Deer Added This Month\n");
+
 
 
     omp_set_num_threads( 4 );	// same as # of sections
@@ -196,8 +206,9 @@ Watcher( )
         // printf( "   Month, %d\t  Year, %d\t    Temp(C), %.2f\t   Precipitation(cm), %.2f\t  Grain Height(cm), %.2f\t    Deer, %d\t Deer Eaten By Bear: %d\n", 
         //             NowMonth,   NowYear,    (5./9.) *(NowTemp-32),    NowPrecip*2.54,          NowHeight*2.54,          NowNumDeer , DeerEatenBear);
 
-        printf( "   Month, %d\t  Year, %d\t    Temp(C), %.2f\t   Precipitation(cm), %.2f\t  Grain Height, %.2f\t    Deer, %d\t Additional Deer Added This Month: %d\n", 
-                    NowMonth,   NowYear,    (5./9.) *(NowTemp-32),    NowPrecip*2.54,          NowHeight,          NowNumDeer , AdditionalDeer);
+        // printf( "Month\tYear\tTemp(C)\tPrecipitation(cm)\tGrain Height\tDeer\tAdditional Deer Added This Month\n");
+        printf( "%d\t%d\t%.2f\t%.2f\t%.2f\t%d\t%d\n", 
+        NowMonth, NowYear, (5./9.)*(NowTemp-32),NowPrecip*2.54, NowHeight, NowNumDeer, AdditionalDeer);
 
 
         tempMonth = NowMonth + 1;
@@ -243,8 +254,8 @@ MoreDeer( )
         tempDeer = NowNumDeer;
         if (NowMonth == 1)
         {
-            AdditionalDeer = 1;
-            
+            // AdditionalDeer = 1;
+            AdditionalDeer = 0;
         }
         else
         {
@@ -253,13 +264,16 @@ MoreDeer( )
 
         
         
-        tempDeer += AdditionalDeer;
+        
 
         // DoneComputing barrier:
         #pragma omp barrier
         // . . .
         
-        NowNumDeer = tempDeer;
+        // tempDeer += AdditionalDeer;
+        // NowNumDeer = tempDeer;
+        // NowNumDeer += AdditionalDeer;
+
         // DoneAssigning barrier:
         #pragma omp barrier
         // . . .
@@ -268,6 +282,38 @@ MoreDeer( )
         #pragma omp barrier
         // . . .
     }
+
+}
+
+
+void
+InitBarrier( int n )
+{
+    NumInThreadTeam = n;
+    NumAtBarrier = 0;
+    omp_init_lock( &Lock );
+}
+
+void
+WaitBarrier( )
+{
+    omp_set_lock( &Lock );
+    {
+        NumAtBarrier++;
+        if( NumAtBarrier == NumInThreadTeam ) // release the waiting threads
+        {
+        NumGone = 0;
+        NumAtBarrier = 0;
+        // let all other threads return before this one unlocks:
+        while( NumGone != NumInThreadTeam - 1 );
+        omp_unset_lock( &Lock );
+        return;
+        }
+    }
+    omp_unset_lock( &Lock );
+    while( NumAtBarrier != 0 ); // all threads wait here until the last one arrives
+    #pragma omp atomic // and sets NumAtBarrier to 0
+    NumGone++;
 
 }
 
