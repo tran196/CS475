@@ -255,7 +255,7 @@ MoreDeer( )
         if (NowMonth == 1)
         {
             // AdditionalDeer = 1;
-            AdditionalDeer = 6;
+            AdditionalDeer = 4;
         }
         else
         {
@@ -270,9 +270,9 @@ MoreDeer( )
         #pragma omp barrier
         // . . .
         
-        // tempDeer += AdditionalDeer;
-        // NowNumDeer = tempDeer;
-        NowNumDeer += AdditionalDeer;
+        tempDeer += AdditionalDeer;
+        NowNumDeer = tempDeer;
+        // NowNumDeer += AdditionalDeer;
 
         // DoneAssigning barrier:
         #pragma omp barrier
