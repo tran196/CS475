@@ -272,7 +272,7 @@ MoreDeer( )
         
         // tempDeer += AdditionalDeer;
         // NowNumDeer = tempDeer;
-        // NowNumDeer += AdditionalDeer;
+        NowNumDeer += AdditionalDeer;
 
         // DoneAssigning barrier:
         #pragma omp barrier
