@@ -16,7 +16,7 @@ float	NowPrecip;		// inches of rain per month
 float	NowTemp;		// temperature this month
 float	NowHeight;		// grain height in inches
 int	NowNumDeer;		// number of deer in the current population
-int AdditionalDeer;
+
 
 //Basic Time Step Will be One Month
 const float GRAIN_GROWS_PER_MONTH =		8.0;
@@ -33,7 +33,12 @@ const float RANDOM_TEMP =			10.0;	// plus or minus noise
 const float MIDTEMP =				40.0;
 const float MIDPRECIP =				10.0;
 
-unsigned int seed;
+//****************************************
+const float BLACKDEATH_TEMP_MIN         =   40.0;  // range of temps BlackDeath prefers
+const float BLACKDEATH_TEMP_MAX         =   60.0;
+const float BLACKDEATH_FREEZE           =   32.0;
+const float BLACKDEATH_PRECIP_THRESH    =   7;     // BlackDeath thrives in precip > 7
+float BlackDeathPct; 
 
 
 omp_lock_t Lock;
@@ -51,7 +56,7 @@ float       SQR( float x );
 void        GrainDeer();
 void        Grain();
 void        Watcher();
-void        MoreDeer();
+void        BlackDeath();
 
 
 // Main
@@ -66,24 +71,10 @@ int main ()
     // starting state (feel free to change this if you want):
     NowNumDeer = 1;
     NowHeight =  1.;
+    
+    BlackDeathPct=  0.;   
 
-// The temp and precipitation are a function of the particular month
-// A year consists of 12 months and 30 days each
-// First Day of winter is January 1
-// Temp and Precipitation follow cosine and since Wave patterns with some randomness added
-    // float ang = (  30.*(float)NowMonth + 15.  ) * ( M_PI / 180. );
-
-    // float temp = AVG_TEMP - AMP_TEMP * cos( ang );
-    // unsigned int seed = 0;
-    // NowTemp = temp + Ranf( &seed, -RANDOM_TEMP, RANDOM_TEMP );
-
-    // float precip = AVG_PRECIP_PER_MONTH + AMP_PRECIP_PER_MONTH * sin( ang );
-    // NowPrecip = precip + Ranf( &seed,  -RANDOM_PRECIP, RANDOM_PRECIP );
-    // if( NowPrecip < 0. )
-    //     NowPrecip = 0.;
-
-
-    printf( "Month\tYear\tTemp(C)\tPrecipitation(cm)\tGrain Height\tDeer\tAdditional Deer Added This Month\n");
+    printf( "Month\tYear\tTemp(C)\tPrecipitation(cm)\tGrain Height\tDeer\tBlackDeath Percentage\n");
 
 
 
@@ -107,7 +98,7 @@ int main ()
 
         #pragma omp section
         {
-            MoreDeer( );	// your own
+            BlackDeath( );	// your own
         }
     }       // implied barrier -- all functions must return in order
         // to allow any of them to get past here
@@ -162,6 +153,10 @@ Grain( )
         TempHeight += tempFactor * precipFactor * GRAIN_GROWS_PER_MONTH;
         TempHeight -= (float)NowNumDeer * ONE_DEER_EATS_PER_MONTH;
 
+            #ifdef BlackDeath
+            TempHeight *= (1 - (BlackDeathPct/100));
+            #endif
+
         if (TempHeight < 0)
         {
             TempHeight = 0.;
@@ -196,19 +191,12 @@ Watcher( )
 
         // DoneComputing barrier:
         #pragma omp barrier
-        // . . .
-
 
         // DoneAssigning barrier:
         #pragma omp barrier
-        // . . .
-
-        // printf( "   Month, %d\t  Year, %d\t    Temp(C), %.2f\t   Precipitation(cm), %.2f\t  Grain Height(cm), %.2f\t    Deer, %d\t Deer Eaten By Bear: %d\n", 
-        //             NowMonth,   NowYear,    (5./9.) *(NowTemp-32),    NowPrecip*2.54,          NowHeight*2.54,          NowNumDeer , DeerEatenBear);
-
-        // printf( "Month\tYear\tTemp(C)\tPrecipitation(cm)\tGrain Height\tDeer\tAdditional Deer Added This Month\n");
-        printf( "%d\t%d\t%.2f\t%.2f\t%.2f\t%d\t%d\n", 
-        NowMonth, NowYear, (5./9.)*(NowTemp-32),NowPrecip*2.54, NowHeight, NowNumDeer, AdditionalDeer);
+    
+        printf( "%d\t%d\t%.2f\t%.2f\t%.2f\t%d\t%.2f\n", 
+        NowMonth, NowYear, (5./9.)*(NowTemp-32),NowPrecip*2.54, NowHeight, NowNumDeer, BlackDeathPct);
 
 
         tempMonth = NowMonth + 1;
@@ -242,79 +230,39 @@ Watcher( )
 
 }
 
-void
-MoreDeer( )
-{
-    int tempDeer;
-    while( NowYear < 2025 )
-    {
-        // compute a temporary next-value for this quantity
-        // based on the current state of the simulation:
-        // . . .
-        tempDeer = NowNumDeer;
-        if (NowMonth == 1)
-        {
-            // AdditionalDeer = 1;
-            AdditionalDeer = 0;
-        }
-        else
-        {
-            AdditionalDeer = 0;
-        }
+void BlackDeath() {
+  while( NowYear < 2025 )
+  {
+    float BlackDeath = BlackDeathPct;
 
-        
-        
-        
-
-        // DoneComputing barrier:
-        #pragma omp barrier
-        // . . .
-        
-        tempDeer += AdditionalDeer;
-        NowNumDeer = tempDeer;
-        // NowNumDeer += AdditionalDeer;
-
-        // DoneAssigning barrier:
-        #pragma omp barrier
-        // . . .
-        
-        // DonePrinting barrier:
-        #pragma omp barrier
-        // . . .
+    if (NowTemp <= BLACKDEATH_FREEZE)
+      BlackDeath = 0.0;
+    else if (NowTemp >= BLACKDEATH_TEMP_MIN && NowTemp <= BLACKDEATH_TEMP_MAX && NowPrecip > BLACKDEATH_PRECIP_THRESH) {
+      BlackDeath += 20.0;
+    } else if (NowTemp >= BLACKDEATH_TEMP_MIN && NowPrecip > BLACKDEATH_PRECIP_THRESH){
+      BlackDeath += 15.0;
+    } else if (NowTemp < BLACKDEATH_TEMP_MIN && NowPrecip > BLACKDEATH_PRECIP_THRESH) {
+      BlackDeath -= 10.0;
+    } else {
+      BlackDeath -= 20.0;
     }
 
-}
+    if (BlackDeath > 100.0)
+      BlackDeath = 100.0;
+    else if (BlackDeath < 0.0)
+      BlackDeath = 0.0;
 
+    // DoneComputing barrier:
+    #pragma omp barrier
+    BlackDeathPct = BlackDeath;
 
-void
-InitBarrier( int n )
-{
-    NumInThreadTeam = n;
-    NumAtBarrier = 0;
-    omp_init_lock( &Lock );
-}
+    // DoneAssigning barrier:
+    #pragma omp barrier
 
-void
-WaitBarrier( )
-{
-    omp_set_lock( &Lock );
-    {
-        NumAtBarrier++;
-        if( NumAtBarrier == NumInThreadTeam ) // release the waiting threads
-        {
-        NumGone = 0;
-        NumAtBarrier = 0;
-        // let all other threads return before this one unlocks:
-        while( NumGone != NumInThreadTeam - 1 );
-        omp_unset_lock( &Lock );
-        return;
-        }
-    }
-    omp_unset_lock( &Lock );
-    while( NumAtBarrier != 0 ); // all threads wait here until the last one arrives
-    #pragma omp atomic // and sets NumAtBarrier to 0
-    NumGone++;
+    // DonePrinting barrier:
+    #pragma omp barrier
 
+  }
 }
 
 //Helper Functions
