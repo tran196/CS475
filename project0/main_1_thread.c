@@ -46,5 +46,5 @@ int main( )
 	// note: %lf stands for "long float", which is how printf prints a "double"
 	//        %d stands for "decimal integer", not "double"
 
-        return 0;
+        return 0; 
 }
