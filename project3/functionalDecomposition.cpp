@@ -16,7 +16,7 @@ float	NowPrecip;		// inches of rain per month
 float	NowTemp;		// temperature this month
 float	NowHeight;		// grain height in inches
 int	NowNumDeer;		// number of deer in the current population
-int AdditionalDeer;
+
 
 //Basic Time Step Will be One Month
 const float GRAIN_GROWS_PER_MONTH =		8.0;
@@ -33,7 +33,18 @@ const float RANDOM_TEMP =			10.0;	// plus or minus noise
 const float MIDTEMP =				40.0;
 const float MIDPRECIP =				10.0;
 
-unsigned int seed;
+//****************************************
+const float BLACKDEATH_TEMP_MIN         =   40.0;  
+const float BLACKDEATH_TEMP_MAX         =   60.0;
+const float BLACKDEATH_FREEZE           =   32.0;
+const float BLACKDEATH_PRECIP_THRESH    =   7;     
+float BlackDeathPct; 
+
+
+omp_lock_t Lock;
+int NumInThreadTeam;
+int NumAtBarrier;
+int NumGone;
 
 //Functions
 
@@ -45,14 +56,14 @@ float       SQR( float x );
 void        GrainDeer();
 void        Grain();
 void        Watcher();
-void        MoreDeer();
+void        BlackDeath();
 
 
 // Main
 
 int main ()
 {
-    // TimeOfDaySeed();
+;
     // starting date and time:
     NowMonth =    0;
     NowYear  = 2019;
@@ -60,21 +71,11 @@ int main ()
     // starting state (feel free to change this if you want):
     NowNumDeer = 1;
     NowHeight =  1.;
+    
+    BlackDeathPct=  0.;   
 
-// The temp and precipitation are a function of the particular month
-// A year consists of 12 months and 30 days each
-// First Day of winter is January 1
-// Temp and Precipitation follow cosine and since Wave patterns with some randomness added
-    float ang = (  30.*(float)NowMonth + 15.  ) * ( M_PI / 180. );
+    printf( "Month\tYear\tTemp(C)\tPrecipitation(cm)\tGrain Height\tGrainDeer\tBlackDeath Percentage\n");
 
-    float temp = AVG_TEMP - AMP_TEMP * cos( ang );
-    unsigned int seed = 0;
-    NowTemp = temp + Ranf( &seed, -RANDOM_TEMP, RANDOM_TEMP );
-
-    float precip = AVG_PRECIP_PER_MONTH + AMP_PRECIP_PER_MONTH * sin( ang );
-    NowPrecip = precip + Ranf( &seed,  -RANDOM_PRECIP, RANDOM_PRECIP );
-    if( NowPrecip < 0. )
-        NowPrecip = 0.;
 
 
     omp_set_num_threads( 4 );	// same as # of sections
@@ -97,7 +98,7 @@ int main ()
 
         #pragma omp section
         {
-            MoreDeer( );	// your own
+            BlackDeath( );	// your own
         }
     }       // implied barrier -- all functions must return in order
         // to allow any of them to get past here
@@ -152,7 +153,15 @@ Grain( )
         TempHeight += tempFactor * precipFactor * GRAIN_GROWS_PER_MONTH;
         TempHeight -= (float)NowNumDeer * ONE_DEER_EATS_PER_MONTH;
 
+<<<<<<< HEAD
         if (TempHeight < 0.)
+=======
+        #ifdef BlackDeath
+        TempHeight *= (1 - (BlackDeathPct/100));
+        #endif
+
+        if (TempHeight < 0)
+>>>>>>> 63f6e9e95fb2de3428be3f2fbd4fbd41df070c3a
         {
             TempHeight = 0.;
         }
@@ -179,25 +188,19 @@ Watcher( )
     int tempYear;
     float tempTemp;
     float tempPrecip;
-
+    unsigned int seed = 0;
 
     while( NowYear < 2025 )
     {
 
         // DoneComputing barrier:
         #pragma omp barrier
-        // . . .
-
 
         // DoneAssigning barrier:
         #pragma omp barrier
-        // . . .
-
-        // printf( "   Month, %d\t  Year, %d\t    Temp(C), %.2f\t   Precipitation(cm), %.2f\t  Grain Height(cm), %.2f\t    Deer, %d\t Deer Eaten By Bear: %d\n", 
-        //             NowMonth,   NowYear,    (5./9.) *(NowTemp-32),    NowPrecip*2.54,          NowHeight*2.54,          NowNumDeer , DeerEatenBear);
-
-        printf( "   Month, %d\t  Year, %d\t    Temp(C), %.2f\t   Precipitation(cm), %.2f\t  Grain Height, %.2f\t    Deer, %d\t Additional Deer Added This Month: %d\n", 
-                    NowMonth,   NowYear,    (5./9.) *(NowTemp-32),    NowPrecip*2.54,          NowHeight,          NowNumDeer , AdditionalDeer);
+    
+        printf( "%d\t%d\t%.2f\t%.2f\t%.2f\t%d\t%.2f\n", 
+        NowMonth, NowYear, (5./9.)*(NowTemp-32),NowPrecip*2.54, NowHeight, NowNumDeer, BlackDeathPct);
 
 
         tempMonth = NowMonth + 1;
@@ -216,7 +219,7 @@ Watcher( )
         float ang = (  30.*(float)NowMonth + 15.  ) * ( M_PI / 180. );
 
         float temp = AVG_TEMP - AMP_TEMP * cos( ang );
-        unsigned int seed = 0;
+        
         NowTemp = temp + Ranf( &seed, -RANDOM_TEMP, RANDOM_TEMP );
 
         float precip = AVG_PRECIP_PER_MONTH + AMP_PRECIP_PER_MONTH * sin( ang );
@@ -231,44 +234,39 @@ Watcher( )
 
 }
 
-void
-MoreDeer( )
-{
-    int tempDeer;
-    while( NowYear < 2025 )
-    {
-        // compute a temporary next-value for this quantity
-        // based on the current state of the simulation:
-        // . . .
-        tempDeer = NowNumDeer;
-        if (NowMonth == 1)
-        {
-            AdditionalDeer = 1;
-            
-        }
-        else
-        {
-            AdditionalDeer = 0;
-        }
+void BlackDeath() {
+  while( NowYear < 2025 )
+  {
+    float BlackDeath = BlackDeathPct;
 
-        
-        
-        tempDeer += AdditionalDeer;
-
-        // DoneComputing barrier:
-        #pragma omp barrier
-        // . . .
-        
-        NowNumDeer = tempDeer;
-        // DoneAssigning barrier:
-        #pragma omp barrier
-        // . . .
-        
-        // DonePrinting barrier:
-        #pragma omp barrier
-        // . . .
+    if (NowTemp <= BLACKDEATH_FREEZE)
+      BlackDeath = 0.0;
+    else if (NowTemp >= BLACKDEATH_TEMP_MIN && NowTemp <= BLACKDEATH_TEMP_MAX && NowPrecip > BLACKDEATH_PRECIP_THRESH) {
+      BlackDeath += 20.0;
+    } else if (NowTemp >= BLACKDEATH_TEMP_MIN && NowPrecip > BLACKDEATH_PRECIP_THRESH){
+      BlackDeath += 15.0;
+    } else if (NowTemp < BLACKDEATH_TEMP_MIN && NowPrecip > BLACKDEATH_PRECIP_THRESH) {
+      BlackDeath -= 10.0;
+    } else {
+      BlackDeath -= 20.0;
     }
 
+    if (BlackDeath > 100.0)
+      BlackDeath = 100.0;
+    else if (BlackDeath < 0.0)
+      BlackDeath = 0.0;
+
+    // DoneComputing barrier:
+    #pragma omp barrier
+    BlackDeathPct = BlackDeath;
+
+    // DoneAssigning barrier:
+    #pragma omp barrier
+
+    // DonePrinting barrier:
+    #pragma omp barrier
+
+  }
 }
 
 //Helper Functions
