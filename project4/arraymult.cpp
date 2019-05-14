@@ -1,6 +1,7 @@
 #include <omp.h>
 #include <stdio.h>
 #include <math.h>
+#include "simd.p4.h"
 
 #define NUMT        1
 #define ARRAYSIZE   100000    //you decide
