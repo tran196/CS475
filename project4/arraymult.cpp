@@ -67,7 +67,7 @@ int main( )
                 SimdMul(A, B, C, ARRAYSIZE);
 
                 double simd_time1 = omp_get_wtime( );
-                double simd_megaMults = (double)ARRAYSIZE/(time1-time0)/1000000.;
+                double simd_megaMults = (double)ARRAYSIZE/(simd_time1-simd_time0)/1000000.;
                 if( simd_megaMults > simd_maxMegaMults )
                         simd_maxMegaMults = simd_megaMults;
 		simd_executionTime = simd_time1 - simd_time0;
