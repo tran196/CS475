@@ -120,7 +120,6 @@ int main( )
 
         // // SIMD Array Multiplcation + Reduction
 
-
         omp_set_num_threads( NUMT );
         fprintf( stderr, "\nSIMD Results Using %d threads\n", NUMT );
 
@@ -140,7 +139,7 @@ int main( )
                 //         C[i] = A[i] * B[i];
                 // }
 
-                SimdMulSum(E, F, ARRAYSIZE);
+               simd_sum = SimdMulSum(E, F, ARRAYSIZE);
 
                 double simd_time1 = omp_get_wtime( );
                 double simd_megaMults = (double)ARRAYSIZE/(simd_time1-simd_time0)/1000000.;
