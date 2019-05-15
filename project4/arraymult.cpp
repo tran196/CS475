@@ -124,6 +124,7 @@ int main( )
 
         simd_maxMegaMults = 0.;
 	simd_executionTime = 0.;
+        float sum = 0.;
 
         for( int t = 0; t < NUMTRIES; t++ )
         {
@@ -135,7 +136,7 @@ int main( )
                 //         C[i] = A[i] * B[i];
                 // }
 
-                SimdMulSum(A, B, ARRAYSIZE);
+                sum = SimdMulSum(A, B, ARRAYSIZE);
 
                 double simd_time1 = omp_get_wtime( );
                 double simd_megaMults = (double)ARRAYSIZE/(simd_time1-simd_time0)/1000000.;
