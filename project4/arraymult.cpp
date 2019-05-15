@@ -34,7 +34,7 @@ int main( )
         {
                 double time0 = omp_get_wtime( );
 
-                #pragma omp parallel for
+                // #pragma omp parallel for
                 for( int i = 0; i < ARRAYSIZE; i++ )
                 {
                         C[i] = A[i] * B[i];
@@ -58,18 +58,22 @@ int main( )
 
         double simd_maxMegaMults = 0.;
 	double simd_executionTime = 0.;
+        
 
         for( int t = 0; t < NUMTRIES; t++ )
         {
                 double simd_time0 = omp_get_wtime( );
 
-                // #pragma omp parallel for
+                #pragma omp parallel
+                {
+                        SimdMul(A, B, C, ARRAYSIZE);
+                }
                 // for( int i = 0; i < ARRAYSIZE; i++ )
                 // {
                 //         C[i] = A[i] * B[i];
                 // }
 
-                SimdMul(A, B, C, ARRAYSIZE);
+                // SimdMul(A, B, C, ARRAYSIZE);
 
                 double simd_time1 = omp_get_wtime( );
                 double simd_megaMults = (double)ARRAYSIZE/(simd_time1-simd_time0)/1000000.;
@@ -121,20 +125,26 @@ int main( )
 
 
         // // SIMD Array Multiplcation + Reduction
-/*****************************************************************************
+// /*****************************************************************************
         omp_set_num_threads( NUMT );
         fprintf( stderr, "\nSIMD Array Multiplcation + Reduction Results Using %d threads\n", NUMT );
 
          simd_maxMegaMults = 0.;
 	 simd_executionTime = 0.;
         float simd_sum[4] = { 0., 0., 0., 0. };
-        
+        float *d;
+        d = (float *) malloc(sizeof(float) * ARRAYSIZE);
+        float *e;
+        e = (float *) malloc(sizeof(float) * ARRAYSIZE);
 
         for( int t = 0; t < NUMTRIES; t++ )
         {
                 double simd_time0 = omp_get_wtime( );
 
-                // #pragma omp parallel for
+                #pragma omp parallel
+                {
+                        SimdMulSum(d, e, ARRAYSIZE);
+                }
                 // for( int i = 0; i < ARRAYSIZE; i++ )
                 // {
                 //         C[i] = A[i] * B[i];
@@ -153,6 +163,6 @@ int main( )
         printf( "SIMD Array Multiplcation + ReductionExecution time for %d threads: %lf\n", NUMT, simd_executionTime );
 	// note: %lf stands for "long float", which is how printf prints a "double"
 	//   
-****************************************************************************/
+// ****************************************************************************/
         return 0; 
 }
