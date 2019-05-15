@@ -88,7 +88,7 @@ int main( )
         //Array Multiplcation + Reduction Timing
 
         omp_set_num_threads( NUMT );
-        fprintf( stderr, "\n Array Multiplcation + Reduction Timing Using %d threads\n", NUMT );
+        fprintf( stderr, "\nArray Multiplcation + Reduction Timing Using %d threads\n", NUMT );
 
         maxMegaMults = 0.;
         executionTime = 0.;
@@ -123,7 +123,7 @@ int main( )
         // // SIMD Array Multiplcation + Reduction
 
         omp_set_num_threads( NUMT );
-        fprintf( stderr, "\nSIMD Results Using %d threads\n", NUMT );
+        fprintf( stderr, "\nSIMD Array Multiplcation + Reduction Results Using %d threads\n", NUMT );
 
          simd_maxMegaMults = 0.;
 	 simd_executionTime = 0.;
@@ -148,8 +148,8 @@ int main( )
 		simd_executionTime = simd_time1 - simd_time0;
         }
 
-        printf( "SIMD Peak Performance = %8.2lf MegaMults/Sec\n", simd_maxMegaMults );
-        printf( "SIMD Execution time for %d threads: %lf\n", NUMT, simd_executionTime );
+        printf( "SIMD Array Multiplcation + Reduction Peak Performance = %8.2lf MegaMults/Sec\n", simd_maxMegaMults );
+        printf( "SIMD Array Multiplcation + ReductionExecution time for %d threads: %lf\n", NUMT, simd_executionTime );
 	// note: %lf stands for "long float", which is how printf prints a "double"
 	//   
 
