@@ -104,7 +104,7 @@ int main( )
                         sum += A[i] * B[i];
                 }
 
-                time1 = omp_get_wtime( );
+                double time1 = omp_get_wtime( );
                 double megaMults = (double)ARRAYSIZE/(time1-time0)/1000000.;
                 if( megaMults > maxMegaMults )
                         maxMegaMults = megaMults;
