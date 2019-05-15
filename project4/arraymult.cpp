@@ -64,16 +64,16 @@ int main( )
         {
                 double simd_time0 = omp_get_wtime( );
 
-                #pragma omp parallel
-                {
-                        SimdMul(A, B, C, ARRAYSIZE);
-                }
-                // for( int i = 0; i < ARRAYSIZE; i++ )
+                // #pragma omp parallel
                 // {
-                //         C[i] = A[i] * B[i];
+                //         SimdMul(A, B, C, ARRAYSIZE);
                 // }
+                // // for( int i = 0; i < ARRAYSIZE; i++ )
+                // // {
+                // //         C[i] = A[i] * B[i];
+                // // }
 
-                // SimdMul(A, B, C, ARRAYSIZE);
+                SimdMul(A, B, C, ARRAYSIZE);
 
                 double simd_time1 = omp_get_wtime( );
                 double simd_megaMults = (double)ARRAYSIZE/(simd_time1-simd_time0)/1000000.;
