@@ -122,8 +122,8 @@ int main( )
         omp_set_num_threads( NUMT );
         fprintf( stderr, "\nSIMD Results Using %d threads\n", NUMT );
 
-        double simd_maxMegaMults = 0.;
-	double simd_executionTime = 0.;
+        simd_maxMegaMults = 0.;
+	simd_executionTime = 0.;
 
         for( int t = 0; t < NUMTRIES; t++ )
         {
