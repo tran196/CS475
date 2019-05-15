@@ -18,6 +18,7 @@ float C[ARRAYSIZE];
 int main( )
 {
 
+//Array Multiplication Non-SIMD
 #ifndef _OPENMP
         fprintf( stderr, "OpenMP is not supported here -- sorry.\n" );
         return 1;
@@ -51,7 +52,7 @@ int main( )
 	// note: %lf stands for "long float", which is how printf prints a "double"
 	//        %d stands for "decimal integer", not "double"
 
-
+//Array Multiplication SIMD
         omp_set_num_threads( NUMT );
         fprintf( stderr, "\nSIMD Results Using %d threads\n", NUMT );
 
@@ -81,6 +82,39 @@ int main( )
         printf( "SIMD Execution time for %d threads: %lf\n", NUMT, simd_executionTime );
 	// note: %lf stands for "long float", which is how printf prints a "double"
 	//   
+
+
+
+        //Array Multiplcation + Reduction Timing
+
+        omp_set_num_threads( NUMT );
+        fprintf( stderr, "Using %d threads\n", NUMT );
+
+        maxMegaMults = 0.;
+        executionTime = 0.;
+        float sum = 0.;
+
+        for( int t = 0; t < NUMTRIES; t++ )
+        {
+                double time0 = omp_get_wtime( );
+
+                #pragma omp parallel for
+                for( int i = 0; i < ARRAYSIZE; i++ )
+                {
+                        sum += A[i] * B[i];
+                }
+
+                time1 = omp_get_wtime( );
+                double megaMults = (double)ARRAYSIZE/(time1-time0)/1000000.;
+                if( megaMults > maxMegaMults )
+                        maxMegaMults = megaMults;
+		executionTime = time1 - time0;
+        }
+
+        printf( "Array Multiplcation + Reduction Peak Performance = %8.2lf MegaMults/Sec\n", maxMegaMults );
+        printf( "Array Multiplcation + Reduction Execution time for %d threads: %lf\n", NUMT, executionTime );
+	// note: %lf stands for "long float", which is how printf prints a "double"
+	//        %d stands for "decimal integer", not "double"
 
         return 0; 
 }
