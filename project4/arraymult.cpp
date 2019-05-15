@@ -140,7 +140,7 @@ int main( )
                 //         C[i] = A[i] * B[i];
                 // }
 
-               float result = SimdMulSum(A, B, ARRAYSIZE);
+        //        float result = SimdMulSum(A, B, ARRAYSIZE);
 
                 double simd_time1 = omp_get_wtime( );
                 double simd_megaMults = (double)ARRAYSIZE/(simd_time1-simd_time0)/1000000.;
