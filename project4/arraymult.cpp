@@ -4,7 +4,11 @@
 #include "simd.p4.h"
 
 #define NUMT        1
+
+#ifndef ARRAYSIZE
 #define ARRAYSIZE   100000    //you decide
+#endif  
+
 #define NUMTRIES    10    	// you decide
 
 float A[ARRAYSIZE];
