@@ -117,38 +117,38 @@ int main( )
 	//        %d stands for "decimal integer", not "double"
 
 
-        // SIMD Array Multiplcation + Reduction
+        // // SIMD Array Multiplcation + Reduction
 
-        omp_set_num_threads( NUMT );
-        fprintf( stderr, "\nSIMD Results Using %d threads\n", NUMT );
+        // omp_set_num_threads( NUMT );
+        // fprintf( stderr, "\nSIMD Results Using %d threads\n", NUMT );
 
-        simd_maxMegaMults = 0.;
-	simd_executionTime = 0.;
-        float sum = 0.;
+        // simd_maxMegaMults = 0.;
+	// simd_executionTime = 0.;
+        // float sum = 0.;
 
-        for( int t = 0; t < NUMTRIES; t++ )
-        {
-                double simd_time0 = omp_get_wtime( );
+        // for( int t = 0; t < NUMTRIES; t++ )
+        // {
+        //         double simd_time0 = omp_get_wtime( );
 
-                // #pragma omp parallel for
-                // for( int i = 0; i < ARRAYSIZE; i++ )
-                // {
-                //         C[i] = A[i] * B[i];
-                // }
+        //         // #pragma omp parallel for
+        //         // for( int i = 0; i < ARRAYSIZE; i++ )
+        //         // {
+        //         //         C[i] = A[i] * B[i];
+        //         // }
 
-                // sum = SimdMulSum(A, B, ARRAYSIZE);
+        //         // sum = SimdMulSum(A, B, ARRAYSIZE);
 
-                double simd_time1 = omp_get_wtime( );
-                double simd_megaMults = (double)ARRAYSIZE/(simd_time1-simd_time0)/1000000.;
-                if( simd_megaMults > simd_maxMegaMults )
-                        simd_maxMegaMults = simd_megaMults;
-		simd_executionTime = simd_time1 - simd_time0;
-        }
+        //         double simd_time1 = omp_get_wtime( );
+        //         double simd_megaMults = (double)ARRAYSIZE/(simd_time1-simd_time0)/1000000.;
+        //         if( simd_megaMults > simd_maxMegaMults )
+        //                 simd_maxMegaMults = simd_megaMults;
+	// 	simd_executionTime = simd_time1 - simd_time0;
+        // }
 
-        printf( "SIMD Peak Performance = %8.2lf MegaMults/Sec\n", simd_maxMegaMults );
-        printf( "SIMD Execution time for %d threads: %lf\n", NUMT, simd_executionTime );
-	// note: %lf stands for "long float", which is how printf prints a "double"
-	// 
+        // printf( "SIMD Peak Performance = %8.2lf MegaMults/Sec\n", simd_maxMegaMults );
+        // printf( "SIMD Execution time for %d threads: %lf\n", NUMT, simd_executionTime );
+	// // note: %lf stands for "long float", which is how printf prints a "double"
+	// // 
 
         return 0; 
 }
