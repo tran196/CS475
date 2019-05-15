@@ -45,6 +45,7 @@ float
 SimdMulSum(float *a, float *b, int len)
 {
 	float sum[4] = { 0., 0., 0., 0. };
+	float total = 0.;
 	int limit = (len / SSE_WIDTH) * SSE_WIDTH;
 
 	__asm
@@ -81,7 +82,8 @@ SimdMulSum(float *a, float *b, int len)
 		sum[i - limit] += a[i] * b[i];
 	}
 
-	return sum[0] + sum[1] + sum[2] + sum[3];
+	total = sum[0] + sum[1] + sum[2] + sum[3];
+	return total;
 }
 
 
