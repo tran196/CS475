@@ -121,7 +121,7 @@ int main( )
 
 
         // // SIMD Array Multiplcation + Reduction
-
+/*****************************************************************************
         omp_set_num_threads( NUMT );
         fprintf( stderr, "\nSIMD Array Multiplcation + Reduction Results Using %d threads\n", NUMT );
 
@@ -153,6 +153,6 @@ int main( )
         printf( "SIMD Array Multiplcation + ReductionExecution time for %d threads: %lf\n", NUMT, simd_executionTime );
 	// note: %lf stands for "long float", which is how printf prints a "double"
 	//   
-
+****************************************************************************/
         return 0; 
 }
