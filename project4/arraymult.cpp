@@ -105,7 +105,7 @@ int main( )
                 //         sum += A[i] * B[i];
                 // }
 
-                NonSimdMultSum(A, B, ARRAYSIZE);
+                NonSimdMulSum(A, B, ARRAYSIZE);
 
                 double time1 = omp_get_wtime( );
                 double megaMults = (double)ARRAYSIZE/(time1-time0)/1000000.;
