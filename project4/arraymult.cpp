@@ -88,7 +88,7 @@ int main( )
         //Array Multiplcation + Reduction Timing
 
         omp_set_num_threads( NUMT );
-        fprintf( stderr, "Using %d threads\n", NUMT );
+        fprintf( stderr, "\n Array Multiplcation + Reduction Timing Using %d threads\n", NUMT );
 
         maxMegaMults = 0.;
         executionTime = 0.;
