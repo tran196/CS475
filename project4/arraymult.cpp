@@ -125,6 +125,7 @@ int main( )
 
          simd_maxMegaMults = 0.;
 	 simd_executionTime = 0.;
+         float simd_sum = 0.;
 
         for( int t = 0; t < NUMTRIES; t++ )
         {
