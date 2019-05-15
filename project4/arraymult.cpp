@@ -3,7 +3,9 @@
 #include <math.h>
 #include "simd.p4.h"
 
+#ifndef NUMT
 #define NUMT        1
+#endif
 
 #ifndef ARRAYSIZE
 #define ARRAYSIZE   100000    //you decide
