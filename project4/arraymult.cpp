@@ -99,11 +99,13 @@ int main( )
         {
                 double time0 = omp_get_wtime( );
 
-                #pragma omp parallel for
-                for( int i = 0; i < ARRAYSIZE; i++ )
-                {
-                        sum += A[i] * B[i];
-                }
+                // #pragma omp parallel for
+                // for( int i = 0; i < ARRAYSIZE; i++ )
+                // {
+                //         sum += A[i] * B[i];
+                // }
+
+                sum = NonSimdMultSum(A, B, ARRAYSIZE);
 
                 double time1 = omp_get_wtime( );
                 double megaMults = (double)ARRAYSIZE/(time1-time0)/1000000.;

@@ -20,6 +20,7 @@
 
 void	SimdMul(    float *, float *,  float *, int );
 float	SimdMulSum( float *, float *, int );
+float   NonSimdMulSum( float *a, float *b, int len );
 
 
 #endif		// SIMD_H
