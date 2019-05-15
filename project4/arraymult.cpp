@@ -125,7 +125,7 @@ int main( )
 
          simd_maxMegaMults = 0.;
 	 simd_executionTime = 0.;
-         float simd_sum[4] = { 0., 0., 0., 0. };
+        float simd_sum[4] = { 0., 0., 0., 0. };
         float *E = new float [ARRAYSIZE];
         float *F = new float [ARRAYSIZE];
 
