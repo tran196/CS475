@@ -137,7 +137,7 @@ int main( )
                 //         C[i] = A[i] * B[i];
                 // }
 
-                SimdMul(A, B, C, ARRAYSIZE);
+                simd_sum = SimdMul(A, B, ARRAYSIZE);
 
                 double simd_time1 = omp_get_wtime( );
                 double simd_megaMults = (double)ARRAYSIZE/(simd_time1-simd_time0)/1000000.;
