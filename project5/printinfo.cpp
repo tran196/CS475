@@ -15,7 +15,7 @@
 #define ID_NVIDIA	0x10de
 
 
-#include "CL/cl.h"
+#include "cl.h"
 
 int
 main( int argc, char *argv[ ] )
