@@ -78,18 +78,19 @@ main( int argc, char *argv[ ] )
 
 	// 2. allocate the host memory buffers:
 
-	float *hA = new float[ NUM_ELEMENTS ];
-	float *hB = new float[ NUM_ELEMENTS ];
-	float *hC = new float[ NUM_ELEMENTS ];
+	float *hA = new float[ GLOBAL_SIZE ];
+	float *hB = new float[ GLOBAL_SIZE ];
+	float *hC = new float[ GLOBAL_SIZE ];
+    float *hD = new float[ GLOBAL_SIZE ];
 
 	// fill the host memory buffers:
 
-	for( int i = 0; i < NUM_ELEMENTS; i++ )
+	for( int i = 0; i < GLOBAL_SIZE; i++ )
 	{
-		hA[i] = hB[i] = (float) sqrt(  (double)i  );
+		hA[i] = hB[i] = hC[i] = (float) sqrt(  (double)i  );
 	}
 
-	size_t dataSize = NUM_ELEMENTS * sizeof(float);
+	size_t dataSize = GLOBAL_SIZE * sizeof(float);
 
 	// 3. create an opencl context:
 
@@ -113,11 +114,15 @@ main( int argc, char *argv[ ] )
 	if( status != CL_SUCCESS )
 		fprintf( stderr, "clCreateBuffer failed (2)\n" );
 
-	cl_mem dC = clCreateBuffer( context, CL_MEM_WRITE_ONLY, dataSize, NULL, &status );
+	cl_mem dC = clCreateBuffer( context, CL_MEM_READ_ONLY, dataSize, NULL, &status );
 	if( status != CL_SUCCESS )
 		fprintf( stderr, "clCreateBuffer failed (3)\n" );
 
-	// 6. enqueue the 2 commands to write the data from the host buffers to the device buffers:
+   	cl_mem dD = clCreateBuffer( context, CL_MEM_WRITE_ONLY, dataSize, NULL, &status );
+	if( status != CL_SUCCESS )
+		fprintf( stderr, "clCreateBuffer failed (4)\n" );
+
+	// 6. enqueue the 3 commands to write the data from the host buffers to the device buffers:
 
 	status = clEnqueueWriteBuffer( cmdQueue, dA, CL_FALSE, 0, dataSize, hA, 0, NULL, NULL );
 	if( status != CL_SUCCESS )
@@ -126,6 +131,10 @@ main( int argc, char *argv[ ] )
 	status = clEnqueueWriteBuffer( cmdQueue, dB, CL_FALSE, 0, dataSize, hB, 0, NULL, NULL );
 	if( status != CL_SUCCESS )
 		fprintf( stderr, "clEnqueueWriteBuffer failed (2)\n" );
+
+    status = clEnqueueWriteBuffer( cmdQueue, dC, CL_FALSE, 0, dataSize, hC, 0, NULL, NULL );
+	if( status != CL_SUCCESS )
+		fprintf( stderr, "clEnqueueWriteBuffer failed (3)\n" );
 
 	Wait( cmdQueue );
 
@@ -184,10 +193,14 @@ main( int argc, char *argv[ ] )
 	if( status != CL_SUCCESS )
 		fprintf( stderr, "clSetKernelArg failed (3)\n" );
 
+	status = clSetKernelArg( kernel, 3, sizeof(cl_mem), &dD );
+	if( status != CL_SUCCESS )
+		fprintf( stderr, "clSetKernelArg failed (4)\n" );
+
 
 	// 11. enqueue the kernel object for execution:
 
-	size_t globalWorkSize[3] = { NUM_ELEMENTS, 1, 1 };
+	size_t globalWorkSize[3] = { GLOBAL_SIZE, 1, 1 };
 	size_t localWorkSize[3]  = { LOCAL_SIZE,   1, 1 };
 
 	Wait( cmdQueue );
@@ -210,7 +223,7 @@ main( int argc, char *argv[ ] )
 
 	// did it work?
 
-	for( int i = 0; i < NUM_ELEMENTS; i++ )
+	for( int i = 0; i < GLOBAL_SIZE; i++ )
 	{
 		float expected = hA[i] * hB[i];
 		if( fabs( hC[i] - expected ) > TOL )
