@@ -15,11 +15,11 @@
 #include "cl_platform.h"
 
 
-//#ifndef NMB
-//#define	NMB			64
-//#endif
+#ifndef NMB
+#define	NMB			64
+#endif
 
-//#define GLOBAL_SIZE		NMB*1024*1024
+#define NUM_ELEMENTS		NMB*1024*1024
 
 #ifndef GLOBAL_SIZE
 #define GLOBAL_SIZE 64
@@ -60,7 +60,7 @@ main( int argc, char *argv[ ] )
 	}
 
     //open csv to append data to
-    FILE *datafile = fopen(argv[1], "a");
+    //FILE *datafile = fopen(argv[1], "a");
 
 	cl_int status;		// returned status from opencl calls
 				// test against CL_SUCCESS
@@ -245,9 +245,9 @@ main( int argc, char *argv[ ] )
 	//	LOCAL_SIZE, LOCAL_SIZE, NUM_WORK_GROUPS, (double)GLOBAL_SIZE/(time1-time0)/1000000000. );
 
     //write to csv
-    if(print_data)
-        fprintf(datafile, "%d,%d,%lf\n", LOCAL_SIZE, GLOBAL_SIZE, (double)GLOBAL_SIZE/(time1-time0)/1000000000.);
-    fclose(datafile);
+    //if(print_data)
+    //    fprintf(datafile, "%d,%d,%lf\n", LOCAL_SIZE, GLOBAL_SIZE, (double)GLOBAL_SIZE/(time1-time0)/1000000000.);
+    //fclose(datafile);
     
 #ifdef WIN32
 	Sleep( 2000 );
@@ -262,10 +262,12 @@ main( int argc, char *argv[ ] )
 	clReleaseMemObject(     dA  );
 	clReleaseMemObject(     dB  );
 	clReleaseMemObject(     dC  );
+	clReleaseMemObject(     dD  );
 
 	delete [ ] hA;
 	delete [ ] hB;
 	delete [ ] hC;
+	delete [ ] hD;
 
 	return 0;
 }
