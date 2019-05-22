@@ -234,15 +234,15 @@ main( int argc, char *argv[ ] )
 		float expected = hA[i] * hB[i];
 		if( fabs( hC[i] - expected ) > TOL )
 		{
-			//fprintf( stderr, "%4d: %13.6f * %13.6f wrongly produced %13.6f instead of %13.6f (%13.8f)\n",
-				//i, hA[i], hB[i], hC[i], expected, fabs(hC[i]-expected) );
-			//fprintf( stderr, "%4d:    0x%08x *    0x%08x wrongly produced    0x%08x instead of    0x%08x\n",
-				//i, LookAtTheBits(hA[i]), LookAtTheBits(hB[i]), LookAtTheBits(hC[i]), LookAtTheBits(expected) );
+			fprintf( stderr, "%4d: %13.6f * %13.6f wrongly produced %13.6f instead of %13.6f (%13.8f)\n",
+				i, hA[i], hB[i], hC[i], expected, fabs(hC[i]-expected) );
+			fprintf( stderr, "%4d:    0x%08x *    0x%08x wrongly produced    0x%08x instead of    0x%08x\n",
+				i, LookAtTheBits(hA[i]), LookAtTheBits(hB[i]), LookAtTheBits(hC[i]), LookAtTheBits(expected) );
 		}
 	}
 
-	//fprintf( stderr, "%8d\t%4d\t%10d\t%10.3lf GigaMultsPerSecond\n",
-	//	LOCAL_SIZE, LOCAL_SIZE, NUM_WORK_GROUPS, (double)GLOBAL_SIZE/(time1-time0)/1000000000. );
+	fprintf( stderr, "%8d\t%4d\t%10d\t%10.3lf GigaMultsPerSecond\n",
+		LOCAL_SIZE, LOCAL_SIZE, NUM_WORK_GROUPS, (double)GLOBAL_SIZE/(time1-time0)/1000000000. );
 
     //write to csv
     //if(print_data)
