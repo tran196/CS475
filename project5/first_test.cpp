@@ -15,8 +15,14 @@
 #include "cl_platform.h"
 
 
-#ifndef NMB
-#define	NMB			64
+//#ifndef NMB
+//#define	NMB			64
+//#endif
+
+//#define GLOBAL_SIZE		NMB*1024*1024
+
+#ifndef GLOBAL_SIZE
+#define GLOBAL_SIZE 64
 #endif
 
 #define NUM_ELEMENTS		NMB*1024*1024
@@ -25,7 +31,7 @@
 #define	LOCAL_SIZE		64
 #endif
 
-#define	NUM_WORK_GROUPS		NUM_ELEMENTS/LOCAL_SIZE
+#define	NUM_WORK_GROUPS		GLOBAL_SIZE/LOCAL_SIZE
 
 const char *			CL_FILE_NAME = { "first.cl" };
 const float			TOL = 0.0001f;
