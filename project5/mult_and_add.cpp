@@ -44,7 +44,7 @@ main( int argc, char *argv[ ] )
 	// see if we can even open the opencl kernel program
 	// (no point going on if we can't):
 
-    const char *CL_FILE_NAME = argv[2];
+    // const char *CL_FILE_NAME = argv[2];
 
 	FILE *fp;
 #ifdef WIN32
