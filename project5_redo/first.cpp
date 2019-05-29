@@ -219,7 +219,7 @@ main( int argc, char *argv[ ] )
 	}
 
     printf("NMB,\tNUM_ELEMENTS\tLOCAL_SIZE,\tNUM_WORK_GROUPS,\tGigaMultsPerSecond\n");
-	fprintf( stderr, "%8d\t%8lf\t%4d\t%10d\t%10.3lf GigaMultsPerSecond\n",
+	fprintf( stderr, "%8d\t%8d\t%4d\t%10d\t%10.3lf GigaMultsPerSecond\n",
 		NMB, NUM_ELEMENTS, LOCAL_SIZE, NUM_WORK_GROUPS, (double)NUM_ELEMENTS/(time1-time0)/1000000000. );
 
 #ifdef WIN32
