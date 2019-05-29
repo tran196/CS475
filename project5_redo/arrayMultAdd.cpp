@@ -83,7 +83,7 @@ main( int argc, char *argv[ ] )
 
 	for( int i = 0; i < NUM_ELEMENTS; i++ )
 	{
-		hA[i] = hB[i] = (float) sqrt(  (double)i  );
+		hA[i] = hB[i] = hC[i] = (float) sqrt(  (double)i  );
 	}
 
 	size_t dataSize = NUM_ELEMENTS * sizeof(float);
@@ -116,7 +116,7 @@ main( int argc, char *argv[ ] )
 
 	cl_mem dD = clCreateBuffer( context, CL_MEM_WRITE_ONLY, dataSize, NULL, &status );
 	if( status != CL_SUCCESS )
-		fprintf( stderr, "clCreateBuffer failed (4)\n" );
+		fprintf( stderr, "clCreateBuffer failed (3)\n" );
 
 	// 6. enqueue the 3 commands to write the data from the host buffers to the device buffers:
 
@@ -171,7 +171,7 @@ main( int argc, char *argv[ ] )
 
 	// 9. create the kernel object:
 
-	cl_kernel kernel = clCreateKernel( program, "ArrayMult", &status );
+	cl_kernel kernel = clCreateKernel( program, "ArrayMultAdd", &status );
 	if( status != CL_SUCCESS )
 		fprintf( stderr, "clCreateKernel failed\n" );
 
@@ -189,9 +189,9 @@ main( int argc, char *argv[ ] )
 	if( status != CL_SUCCESS )
 		fprintf( stderr, "clSetKernelArg failed (3)\n" );
 
-	// status = clSetKernelArg( kernel, 3, sizeof(cl_mem), &dD );
-	// if( status != CL_SUCCESS )
-	// 	fprintf( stderr, "clSetKernelArg failed (4)\n" );
+	status = clSetKernelArg( kernel, 3, sizeof(cl_mem), &dD );
+	if( status != CL_SUCCESS )
+		fprintf( stderr, "clSetKernelArg failed (4)\n" );
 
 	// 11. enqueue the kernel object for execution:
 
@@ -220,7 +220,7 @@ main( int argc, char *argv[ ] )
 
 	for( int i = 0; i < NUM_ELEMENTS; i++ )
 	{
-		float expected = hA[i] * hB[i];
+		float expected = hA[i] * hB[i] + hC[i];
 		if( fabs( hC[i] - expected ) > TOL )
 		{
 			//fprintf( stderr, "%4d: %13.6f * %13.6f wrongly produced %13.6f instead of %13.6f (%13.8f)\n",
@@ -233,9 +233,6 @@ main( int argc, char *argv[ ] )
     printf("NMB,\tNUM_ELEMENTS,\tLOCAL_SIZE,\tNUM_WORK_GROUPS,\tGigaMultsPerSecond\n");
 	fprintf( stderr, "%8d\t%8d\t%4d\t%10d\t%10.3lf\n",
 		NMB, NUM_ELEMENTS, LOCAL_SIZE, NUM_WORK_GROUPS, (double)NUM_ELEMENTS/(time1-time0)/1000000000. );
-	
-	// printf("%8d,\t%8d,\t%4d,\t%10d,\t%10.3lf\n",
-	// 	NMB, NUM_ELEMENTS, LOCAL_SIZE, NUM_WORK_GROUPS, (double)NUM_ELEMENTS/(time1-time0)/1000000000. );
 
 #ifdef WIN32
 	Sleep( 2000 );

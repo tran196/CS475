@@ -76,8 +76,8 @@ main( int argc, char *argv[ ] )
 
 	float *hA = new float[ NUM_ELEMENTS ];
 	float *hB = new float[ NUM_ELEMENTS ];
-	float *hC = new float[ NUM_ELEMENTS ];
-	float *hD = new float[ NUM_ELEMENTS ];
+	float *hC = new float[ NUM_WORK_GROUPS ];
+
 
 	// fill the host memory buffers:
 
@@ -87,6 +87,7 @@ main( int argc, char *argv[ ] )
 	}
 
 	size_t dataSize = NUM_ELEMENTS * sizeof(float);
+	size_t cSize = NUM_WORK_GROUPS * sizeof(float);
 
 	// 3. create an opencl context:
 
@@ -110,25 +111,17 @@ main( int argc, char *argv[ ] )
 	if( status != CL_SUCCESS )
 		fprintf( stderr, "clCreateBuffer failed (2)\n" );
 
-	cl_mem dC = clCreateBuffer( context, CL_MEM_READ_ONLY, dataSize, NULL, &status );
+	cl_mem dC = clCreateBuffer( context, CL_MEM_WRITE_ONLY, cSize, NULL, &status );
 	if( status != CL_SUCCESS )
 		fprintf( stderr, "clCreateBuffer failed (3)\n" );
 
-	cl_mem dD = clCreateBuffer( context, CL_MEM_WRITE_ONLY, dataSize, NULL, &status );
-	if( status != CL_SUCCESS )
-		fprintf( stderr, "clCreateBuffer failed (4)\n" );
-
-	// 6. enqueue the 3 commands to write the data from the host buffers to the device buffers:
+	// 6. enqueue the 2 commands to write the data from the host buffers to the device buffers:
 
 	status = clEnqueueWriteBuffer( cmdQueue, dA, CL_FALSE, 0, dataSize, hA, 0, NULL, NULL );
 	if( status != CL_SUCCESS )
 		fprintf( stderr, "clEnqueueWriteBuffer failed (1)\n" );
 
 	status = clEnqueueWriteBuffer( cmdQueue, dB, CL_FALSE, 0, dataSize, hB, 0, NULL, NULL );
-	if( status != CL_SUCCESS )
-		fprintf( stderr, "clEnqueueWriteBuffer failed (2)\n" );
-	
-	status = clEnqueueWriteBuffer( cmdQueue, dC, CL_FALSE, 0, dataSize, hC, 0, NULL, NULL );
 	if( status != CL_SUCCESS )
 		fprintf( stderr, "clEnqueueWriteBuffer failed (2)\n" );
 
@@ -171,7 +164,7 @@ main( int argc, char *argv[ ] )
 
 	// 9. create the kernel object:
 
-	cl_kernel kernel = clCreateKernel( program, "ArrayMult", &status );
+	cl_kernel kernel = clCreateKernel( program, "ArrayMultReduce", &status );
 	if( status != CL_SUCCESS )
 		fprintf( stderr, "clCreateKernel failed\n" );
 
@@ -185,13 +178,15 @@ main( int argc, char *argv[ ] )
 	if( status != CL_SUCCESS )
 		fprintf( stderr, "clSetKernelArg failed (2)\n" );
 
-	status = clSetKernelArg( kernel, 2, sizeof(cl_mem), &dC );
+
+	status = clSetKernelArg( kernel, 2, LOCAL_SIZE * sizeof(float), NULL );
 	if( status != CL_SUCCESS )
 		fprintf( stderr, "clSetKernelArg failed (3)\n" );
 
-	// status = clSetKernelArg( kernel, 3, sizeof(cl_mem), &dD );
-	// if( status != CL_SUCCESS )
-	// 	fprintf( stderr, "clSetKernelArg failed (4)\n" );
+	status = clSetKernelArg( kernel, 3, sizeof(cl_mem), &dC );
+	if( status != CL_SUCCESS )
+		fprintf( stderr, "clSetKernelArg failed (4)\n" );
+
 
 	// 11. enqueue the kernel object for execution:
 
@@ -212,7 +207,7 @@ main( int argc, char *argv[ ] )
 
 	// 12. read the results buffer back from the device to the host:
 
-	status = clEnqueueReadBuffer( cmdQueue, dC, CL_TRUE, 0, dataSize, hD, 0, NULL, NULL );
+	status = clEnqueueReadBuffer( cmdQueue, dC, CL_TRUE, 0, dataSize, hC, 0, NULL, NULL );
 	if( status != CL_SUCCESS )
 			fprintf( stderr, "clEnqueueReadBuffer failed\n" );
 
@@ -233,9 +228,6 @@ main( int argc, char *argv[ ] )
     printf("NMB,\tNUM_ELEMENTS,\tLOCAL_SIZE,\tNUM_WORK_GROUPS,\tGigaMultsPerSecond\n");
 	fprintf( stderr, "%8d\t%8d\t%4d\t%10d\t%10.3lf\n",
 		NMB, NUM_ELEMENTS, LOCAL_SIZE, NUM_WORK_GROUPS, (double)NUM_ELEMENTS/(time1-time0)/1000000000. );
-	
-	// printf("%8d,\t%8d,\t%4d,\t%10d,\t%10.3lf\n",
-	// 	NMB, NUM_ELEMENTS, LOCAL_SIZE, NUM_WORK_GROUPS, (double)NUM_ELEMENTS/(time1-time0)/1000000000. );
 
 #ifdef WIN32
 	Sleep( 2000 );
@@ -250,12 +242,10 @@ main( int argc, char *argv[ ] )
 	clReleaseMemObject(     dA  );
 	clReleaseMemObject(     dB  );
 	clReleaseMemObject(     dC  );
-	clReleaseMemObject(     dD  );
 
 	delete [ ] hA;
 	delete [ ] hB;
 	delete [ ] hC;
-	delete [ ] hD;
 
 	return 0;
 }
